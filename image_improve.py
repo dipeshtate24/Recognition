@@ -10,8 +10,7 @@ def predict_meter_type(img_path):
     """
     Predicts the type of meter (Analog or Digital) from the given image.
     """
-    model = tf.keras.models.load_model("C:/Users/Dipesh/PycharmProjects/pythonProject2/Final_assembling"
-                                       "/Best_meter_recognition_model/meter_type_classification_best.h5")
+    model = tf.keras.models.load_model("Best_meter_recognition_model/meter_type_classification_best.h5")
 
     # Load image and preprocess
     img = image.load_img(img_path, target_size=(128, 128))
@@ -121,8 +120,7 @@ def digit_recognition(image_folder):
     """
     Loads a trained model and predicts digits from images in the given folder.
     """
-    model_path = ("C:/Users/Dipesh/PycharmProjects/pythonProject2/Final_assembling/Best_digit_recognition_model"
-                  "/digit_recognition_model_CNN_4.h5")
+    model_path = ("Best_digit_recognition_model/digit_recognition_model_CNN_4.h5")
     model = tf.keras.models.load_model(model_path)
 
     images = []
