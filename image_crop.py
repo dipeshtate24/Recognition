@@ -1,16 +1,16 @@
-from imutils.perspective import four_point_transform
-import numpy as np
 import cv2
+import imutils
+import numpy as np
+from imutils.perspective import four_point_transform
 
 
-# Resize the image and set aspect ratio
 def image_resizer(image, new_width=500):
     # Get height and width of the image
-    h, w, c = image.shape
+    h, w, _ = image.shape
     new_height = int((h / w) * new_width)  # Calculate new height while maintaining aspect ratio
-    size = (new_width, new_height)
-    image_resized = cv2.resize(image, (new_width, new_height))  # Resize the image
-    return image_resized, size
+    size = (new_width, new_height)  # Store the new size
+    image_resized = imutils.resize(image, width=new_width)  # Resize the image while maintaining aspect ratio
+    return image_resized, size  # Return resized image and new size
 
 
 def img_crop(img_paths):
@@ -27,18 +27,24 @@ def img_crop(img_paths):
     # Convert to grayscale
     gray = cv2.cvtColor(img_resized, cv2.COLOR_BGR2GRAY)
 
-    # Apply Gaussian Blur
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    gray = cv2.bilateralFilter(gray, 9, 70, 70)
 
-    # Detect edges using Canny
-    edge_image = cv2.Canny(blur, 75, 200)
+    gray = cv2.fastNlMeansDenoising(gray, None, 10, 7, 21)
 
-    # Apply morphological dilation
-    kernel = np.ones((5, 5), np.uint8)
-    dilate = cv2.dilate(edge_image, kernel, iterations=1)
+    # Apply Gaussian blur
+    blur = cv2.GaussianBlur(gray, (3, 3), 2)  # original sigmax value is 0 but check using increase value of sigamx by 2
+
+    # Edge detection
+    edge_image = cv2.Canny(blur, 30, 150)
+
+    # Morphological closing to enhance edges
+    kernel = np.ones((2, 2), np.uint8)
+    closing = cv2.morphologyEx(edge_image, cv2.MORPH_CLOSE, kernel)
 
     # Find contours
-    contours, _ = cv2.findContours(dilate, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours = cv2.findContours(closing, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+    contours = imutils.grab_contours(contours)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
 
     four_points = None
@@ -63,8 +69,7 @@ def img_crop(img_paths):
 
         # Apply perspective transform to the original image
         wrap_image = four_point_transform(img_original, four_points_original)
-
         return wrap_image
 
-    else:
-        print("No quadrilateral found in the image.")
+    print("No quadrilateral found in the image.")
+    return None
