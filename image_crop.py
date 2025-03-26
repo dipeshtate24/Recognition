@@ -29,20 +29,21 @@ def img_crop(img_paths):
 
     gray = cv2.bilateralFilter(gray, 9, 70, 70)
 
-    gray = cv2.fastNlMeansDenoising(gray, None, 10, 7, 21)
+    # gray = cv2.fastNlMeansDenoising(gray, None, 10, 7, 21)
 
     # Apply Gaussian blur
     blur = cv2.GaussianBlur(gray, (3, 3), 2)  # original sigmax value is 0 but check using increase value of sigamx by 2
 
     # Edge detection
-    edge_image = cv2.Canny(blur, 30, 150)
+    edge_image = cv2.Canny(blur, 50, 150)
 
     # Morphological closing to enhance edges
     kernel = np.ones((2, 2), np.uint8)
-    closing = cv2.morphologyEx(edge_image, cv2.MORPH_CLOSE, kernel)
+    dilate = cv2.dilate(edge_image, kernel, iterations=1)
+    closing = cv2.morphologyEx(dilate, cv2.MORPH_CLOSE, kernel)
 
     # Find contours
-    contours = cv2.findContours(closing, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(closing, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     contours = imutils.grab_contours(contours)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
@@ -69,6 +70,10 @@ def img_crop(img_paths):
 
         # Apply perspective transform to the original image
         wrap_image = four_point_transform(img_original, four_points_original)
+        return wrap_image
+
+    else:
+        print("Warning: No 4-point contour found.")
         return wrap_image
 
     print("No quadrilateral found in the image.")
