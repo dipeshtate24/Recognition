@@ -29,8 +29,6 @@ def img_crop(img_paths):
 
     gray = cv2.bilateralFilter(gray, 9, 70, 70)
 
-    # gray = cv2.fastNlMeansDenoising(gray, None, 10, 7, 21)
-
     # Apply Gaussian blur
     blur = cv2.GaussianBlur(gray, (3, 3), 2)  # original sigmax value is 0 but check using increase value of sigamx by 2
 
