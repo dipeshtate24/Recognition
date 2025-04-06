@@ -33,7 +33,7 @@ def img_crop(img_paths):
     blur = cv2.GaussianBlur(gray, (3, 3), 2)  # original sigmax value is 0 but check using increase value of sigamx by 2
 
     # Edge detection
-    edge_image = cv2.Canny(blur, 50, 150)
+    edge_image = cv2.Canny(blur, 30, 150)
 
     # Morphological closing to enhance edges
     kernel = np.ones((2, 2), np.uint8)
@@ -41,7 +41,7 @@ def img_crop(img_paths):
     closing = cv2.morphologyEx(dilate, cv2.MORPH_CLOSE, kernel)
 
     # Find contours
-    contours, _ = cv2.findContours(closing, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours = cv2.findContours(closing, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     contours = imutils.grab_contours(contours)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
