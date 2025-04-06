@@ -59,7 +59,7 @@ def img_crop(img_paths):
 
     if four_points is not None:
         # Draw the contour on the resized image
-        cv2.drawContours(img_resized, [four_points], -1, (0, 255, 0), 3)
+        cv2.drawContours(img_resized, [four_points], -1, (0, 255, 0), 2)
 
         # Find four points for the original image
         multiplier = img_original.shape[1] / size[0]
